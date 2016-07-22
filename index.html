@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>require.js</title>
+    <link rel="stylesheet" style="text/css" href="css/index.css" />
+    <!-- <script type="text/javascript" src="base/require.js" data-main="base/main.js"></script> -->
+    <!-- <link rel="stylesheet" href="https://js.arcgis.com/4.0/esri/css/main.css">
+    <script src="https://js.arcgis.com/4.0/"></script> -->
+    <link rel="stylesheet" href="http://127.0.0.1/arcgis_js_api/3.17/esri/css/esri.css" />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <script src="http://127.0.0.1/arcgis_js_api/3.17/init.js"></script>
+    <script src="base/jquery.1.10.js"></script>
+    <script type="text/javascript" src="script/main.js"></script>
+    <script src="script/funcs/func1/func1.js"></script>
+    <script type="text/javascript">
+        require(["dojo/dom",
+                "dojo/_base/lang",
+                "dojo/json",
+                "esri/config",
+                "esri/map",
+                "esri/dijit/HomeButton",
+                "esri/layers/WebTiledLayer",
+                "esri/layers/TileInfo",
+                "esri/geometry/Point",
+                "dojo/parser",
+                "esri/graphic",
+                "esri/geometry/Geometry",
+                "esri/geometry/Extent",
+                "esri/SpatialReference",
+                "esri/tasks/GeometryService",
+                "esri/tasks/LengthsParameters",
+                "esri/tasks/AreasAndLengthsParameters",
+                "esri/toolbars/draw",
+                "esri/symbols/SimpleFillSymbol",
+                "esri/symbols/SimpleLineSymbol"
+            ],
+            function(dom, lang, json, esriConfig, Map,HomeButton, WebTiledLayer, TileInfo, Point, parser, Graphic, Geometry, Extent,
+                SpatialReference, GeometryService, LengthsParameters, AreasAndLengthsParameters, Draw, SimpleFillSymbol, SimpleLineSymbol) {
+                //identify proxy page to use if the toJson payload to the geometry service is greater than 2000 characters.
+                //If this null or not available the project and lengths operation will not work.  Otherwise it will do a http post to the proxy.
+                esriConfig.defaults.io.proxyUrl = "/proxy/";
+                esriConfig.defaults.io.alwaysUseProxy = false;
+                parser.parse();
+                //初始化地图
+                map = new Map("mapView", {
+                    // basemap: "topo",
+                    center: [11860161.18265182, 4410164.325432656],
+                    // zoom: 15
+                    "SpatialReference": {
+                        "wkid": 102113
+                    },
+                    center: [0.985, 29.822],
+                    zoom: 4
+                });
+                initGoogleMap();
+                var layer1 = new googleimage();
+                var layer2 = new googlePOI();
+                map.addLayers([layer1, layer2]);
+
+                var extent=new esri.geometry.Extent(5089674.965265852,359613.32254567265,18630647.400037795,8460715.328319639,map.spatialReference);
+                //HomeButton
+                var homeButton = new HomeButton({
+                    theme: "HomeButton",
+                    map: map,
+                    extent: extent,
+                    visible: true
+                }, dom.byId("homeBtn"));
+                homeButton.startup();
+                //天地图tile参数
+                //定义瓦片结构
+                // var tileInfo = new esri.layers.TileInfo({
+                //     "rows": 256,
+                //     "cols": 256,
+                //     "compressionQuality": 0,
+                //     "origin": {
+                //         "x": -180,
+                //         "y": 90
+                //     },
+                //     "spatialReference": {
+                //         "wkid": 4326
+                //     },
+                //     "lods": [{
+                //         "level": 2,
+                //         "resolution": 0.3515625,
+                //         "scale": 147748796.52937502
+                //     }, {
+                //         "level": 3,
+                //         "resolution": 0.17578125,
+                //         "scale": 73874398.264687508
+                //     }, {
+                //         "level": 4,
+                //         "resolution": 0.087890625,
+                //         "scale": 36937199.132343754
+                //     }, {
+                //         "level": 5,
+                //         "resolution": 0.0439453125,
+                //         "scale": 18468599.566171877
+                //     }, {
+                //         "level": 6,
+                //         "resolution": 0.02197265625,
+                //         "scale": 9234299.7830859385
+                //     }, {
+                //         "level": 7,
+                //         "resolution": 0.010986328125,
+                //         "scale": 4617149.8915429693
+                //     }, {
+                //         "level": 8,
+                //         "resolution": 0.0054931640625,
+                //         "scale": 2308574.9457714846
+                //     }, {
+                //         "level": 9,
+                //         "resolution": 0.00274658203125,
+                //         "scale": 1154287.4728857423
+                //     }, {
+                //         "level": 10,
+                //         "resolution": 0.001373291015625,
+                //         "scale": 577143.73644287116
+                //     }, {
+                //         "level": 11,
+                //         "resolution": 0.0006866455078125,
+                //         "scale": 288571.86822143558
+                //     }, {
+                //         "level": 12,
+                //         "resolution": 0.00034332275390625,
+                //         "scale": 144285.93411071779
+                //     }, {
+                //         "level": 13,
+                //         "resolution": 0.000171661376953125,
+                //         "scale": 72142.967055358895
+                //     }, {
+                //         "level": 14,
+                //         "resolution": 8.58306884765625e-005,
+                //         "scale": 36071.483527679447
+                //     }, {
+                //         "level": 15,
+                //         "resolution": 4.291534423828125e-005,
+                //         "scale": 18035.741763839724
+                //     }, {
+                //         "level": 16,
+                //         "resolution": 2.1457672119140625e-005,
+                //         "scale": 9017.8708819198619
+                //     }, {
+                //         "level": 17,
+                //         "resolution": 1.0728836059570313e-005,
+                //         "scale": 4508.9354409599309
+                //     }, {
+                //         "level": 18,
+                //         "resolution": 5.3644180297851563e-006,
+                //         "scale": 2254.4677204799655
+                //     }]
+                // });
+                // //图层
+                // var baseMap = new WebTiledLayer("http://{subDomain}.tianditu.com/DataServer?T=vec_c&X={col}&Y={row}&L={level}", {
+                //     "copyright": "Tianditu",
+                //     "id": "Tianditu",
+                //     "subDomains": ["t0", "t1", "t2"],
+                //     "tileInfo": tileInfo
+                // });
+                // //底图标注
+                // var baseMapMarker = new WebTiledLayer("http://{subDomain}.tianditu.com/DataServer?T=cva_c&X={col}&Y={row}&L={level}", {
+                //     "copyright": "Tianditu",
+                //     "id": "Tianditu2",
+                //     "subDomains": ["t0", "t1", "t2"],
+                //     "tileInfo": tileInfo
+                // });
+                // //添加图层
+                // map.addLayers([baseMap, baseMapMarker]);
+
+
+                //设置地图中心
+                map.centerAndZoom(new esri.geometry.Point({
+                    "x": 11860161.18265182, //北京中心 // "x":97.39,//中国中心
+                    "y": 4410164.325432656,
+                    "spatialReference":map.spatialReference
+                }), 4);
+
+                var tb = new Draw(map);
+                // map.on("load", function() {
+                //     tb.on("draw-end", lang.hitch(map, getAreaAndLength));
+                //     $(".measure_distance").on("click", function() {
+                //         tb.activate(Draw.POLYLINE);
+                //     });
+                //     $(".measure_area").on("click", function() {
+                //         tb.activate(Draw.POLYGON);
+                //     })
+                // });
+                $(document).ready(function() {
+                    tb.on("draw-end", lang.hitch(map, getAreaAndLength));
+                    $(".measure_distance").on("click", function() {
+                        map.graphics.clear();
+                        tb.activate(Draw.POLYLINE);
+                    });
+                    $(".measure_area").on("click", function() {
+                        map.graphics.clear();
+                        tb.activate(Draw.POLYGON);
+                    })
+                });
+
+                var geometryService = new GeometryService("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Utilities/Geometry/GeometryServer");
+                geometryService.on("areas-and-lengths-complete", outputAreaAndLength);
+                geometryService.on("lengths-complete", outputAreaAndLength);
+
+                function getAreaAndLength(evtObj) {
+                    tb.deactivate();
+                    var map = this,
+                        geometry = evtObj.geometry;
+
+                    if (geometry.type == "polygon") {
+                        var graphic = map.graphics.add(new Graphic(geometry, new SimpleFillSymbol()));
+
+                        //setup the parameters for the areas and lengths operation
+                        var areasAndLengthParams = new AreasAndLengthsParameters();
+                        areasAndLengthParams.lengthUnit = GeometryService.UNIT_METER;
+                        areasAndLengthParams.areaUnit = GeometryService.UNIT_SQUARE_METERS;
+                        areasAndLengthParams.calculationType = "geodesic";
+                        geometryService.simplify([geometry], function(simplifiedGeometries) {
+                            areasAndLengthParams.polygons = simplifiedGeometries;
+                            geometryService.areasAndLengths(areasAndLengthParams);
+                        });
+                    } else if (geometry.type == "polyline") {
+                        var graphic = map.graphics.add(new Graphic(geometry, new SimpleLineSymbol()));
+                        var LengthsParameters = new esri.tasks.LengthsParameters();
+                        LengthsParameters.lengthUnit = GeometryService.UNIT_METER;
+                        LengthsParameters.geodesic = true;
+                        LengthsParameters.polylines = [geometry];
+                        geometryService.lengths(LengthsParameters);
+                    }
+
+                }
+
+                function outputAreaAndLength(evtObj) {
+                    var result = evtObj.result;
+                    console.log(json.stringify(result));
+                    if (result.hasOwnProperty("areas") && result.hasOwnProperty("lengths")) {
+                        dom.byId("measure_result").innerHTML = "面积为：" + result.areas[0].toFixed(3) + "&nbsp;平方米<br>" + "长度为：" + result.lengths[0].toFixed(3) + "&nbsp;米";
+                    } else if (!result.hasOwnProperty("areas") && result.hasOwnProperty("lengths")) {
+                        dom.byId("measure_result").innerHTML = "长度为：" + result.lengths[0].toFixed(3) + "&nbsp;米";
+                    }
+                };
+            });
+
+
+
+    </script>
+</head>
+
+<body>
+    <div class="top">
+        <!-- <img src="img/index/logo.png" alt="" class="top_img"/> -->
+    </div>
+    <div class="left">
+        <div class="data_list">
+            <ul class="ce">
+                <li> <a class="xz" href="#">目录A</a> </li>
+                <li>
+                    <a href="#">目录B <img class="more" src="images/more.png"/></a>
+                    <ul class="er">
+                        <li> <a href="##">二级目录A</a> </li>
+                        <li class="e_li">
+                            <a href="##">二级目录B</a>
+                            <ul class="thr">
+                                <li> <a href="##">三级目录A</a> </li>
+                                <li>
+                                    <!-- <a href="##">三级目录B <img class="more1" src="images/more1.png"/></a> -->
+                                    <a href="##">三级目录B</a>
+                                    <!-- <div class="thr_nr">
+                             <h3> 三级目录B主要内容 </h3>
+                         <img src="images/aa.png"/>
+                       </div> -->
+                                </li>
+                                <li> <a href="##">三级目录C</a> </li>
+                                <li>
+                                    <!-- <a href="##">三级目录D <img class="more1" src="images/more1.png"/></a> -->
+                                    <a href="##">三级目录D </a>
+                                    <!-- <div class="thr_nr">
+                             <h3> 三级目录D主要内容 </h3>
+                         <img src="images/bb.png"/>
+                       </div> -->
+                                </li>
+                                <div class="clear"></div>
+                            </ul>
+                        </li>
+                        <li> <a href="##">二级目录C</a> </li>
+                        <li class="e_li">
+                            <a href="##">二级目录D</a>
+                            <ul class="thr">
+                                <li> <a href="##">三级目录A</a> </li>
+                                <li> <a href="##">三级目录B</a> </li>
+                                <li> <a href="##">三级目录C</a> </li>
+                                <li> <a href="##">三级目录D</a> </li>
+                                <div class="clear"></div>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li> <a href="#">目录C</a> </li>
+                <li> <a href="#">目录D</a> </li>
+                <li> <a href="#">目录E</a> </li>
+                <li>
+                    <a href="#">目录F <img class="more" src="images/more.png"/></a>
+                    <ul class="er">
+                        <li> <a href="##">二级目录A</a> </li>
+                        <li> <a href="##">二级目录B</a> </li>
+                        <li> <a href="##">二级目录C</a> </li>
+                        <li> <a href="##">二级目录D</a> </li>
+                    </ul>
+                </li>
+                <div class="clear"></div>
+            </ul>
+        </div>
+    </div>
+    <!-- left end -->
+    <div id="mapView" class="map">
+        <div id="homeBtn"></div>
+        <div class="search_box">
+            <select class="sel_1" id="sel_a">
+                <option value="volvo">Volvo</option>
+                <option value="saab">Saab</option>
+                <option value="fiat">Fiat</option>
+                <option value="audi">Audi</option>
+            </select>
+            <select class="sel_1" id="sel_b">
+                <option value="volvo">Volvo</option>
+                <option value="saab">Saab</option>
+                <option value="fiat">Fiat</option>
+                <option value="audi">Audi</option>
+            </select>
+            <div class="search_key" title="查询">查询</div>
+        </div>
+        <!-- search end -->
+        <div class="measure_tools">
+            <a class="measure_distance">
+                <img class="" src="img/tools/btn_measureLength.png" />
+                <span>测距</span>
+            </a>
+            <a class="measure_area">
+                <img class="" src="img/tools/btn_measureArea.png" />
+                <span>测面</span>
+            </a>
+        </div>
+        <div id="measure_result" class="measure_result"></div>
+        <!-- tools end -->
+    </div>
+    <!-- map end -->
+    <div class="bottom">
+        版权所有
+    </div>
+
+</body>
+
+</html>
