@@ -26,14 +26,14 @@
   dojo.ready(init);
   function init(){
   map=new esri.Map("map");
-  // initGoogleMap();
-  // var layer1=new googleimage();
-  // var layer2=new googlePOI();
-   // map.addLayers([layer1,layer2]);
-  initTianDiTu();
-  var layertdt1=new tdtimage();
-  var layertdt2=new tdtlabel();
-  map.addLayers([layertdt1,layertdt2]);
+  initGoogleMap();
+  var layer1=new googleimage();
+  var layer2=new googlePOI();
+   map.addLayers([layer1,layer2]);
+  // initTianDiTu();
+  // var layertdt1=new tdtimage();
+  // var layertdt2=new tdtlabel();
+  // map.addLayers([layertdt1,layertdt2]);
   map.centerAndZoom(new esri.geometry.Point({
                 "x": 97.39,
                 "y": 39.91,

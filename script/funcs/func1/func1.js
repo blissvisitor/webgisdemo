@@ -8,8 +8,8 @@ function _show(){
      //初始化、属性方法、事件绑定
      load:function(){
        console.log("func1 loaded "+new Date());
-     }
-     function initGoogleMap() {
+     },
+     initGoogleMap:function() {
 
      dojo.declare("googleimage", esri.layers.TiledMapServiceLayer, {
          constructor: function() {
@@ -243,8 +243,9 @@ function _show(){
                  "s=" + s;
              return url;
          }
-     });
+     })
 
-   };
-   return module;
+   }
+ }
+ return module;
 })
