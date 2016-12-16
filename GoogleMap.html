@@ -7,8 +7,8 @@
   <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
   <title>谷歌地图服务</title>
    
-  <link rel="stylesheet" href="http://js.arcgis.com/3.9/js/dojo/dijit/themes/nihilo/nihilo.css">
-  <link rel="stylesheet" href="http://js.arcgis.com/3.9/js/dojo/dijit/themes/claro/claro.css">
+  <!-- <link rel="stylesheet" href="http://js.arcgis.com/3.9/js/dojo/dijit/themes/nihilo/nihilo.css">
+  <link rel="stylesheet" href="http://js.arcgis.com/3.9/js/dojo/dijit/themes/claro/claro.css"> -->
   <link rel="stylesheet" href="http://js.arcgis.com/3.9/js/esri/css/esri.css">
   <style>
   html,body,#map
@@ -17,15 +17,25 @@
   height:100%;
   
   }
+    #HomeButton {
+      position: absolute;
+      top: 95px;
+      left: 20px;
+      z-index: 50;
+    }
   </style>
   <script src="http://js.arcgis.com/3.9/"></script>
   </head>
   <script>
   var map;
+  var center;
   dojo.require("esri.map");
+ dojo.require("esri.dijit.HomeButton");
   dojo.ready(init);
   function init(){
-  map=new esri.Map("map");
+  map=new esri.Map("map",{
+	center:[97.39,39.91]  	
+  });
   initGoogleMap();
   var layer1=new googleimage();
   var layer2=new googlePOI();
@@ -41,8 +51,15 @@
                     "wkid": 4326
                 }
             }), 4);
+var home = new esri.dijit.HomeButton({
+        map: map
+      }, "HomeButton");
+      home.startup();
+
   dojo.connect(map,"onMouseMove",showCoords) 
   }
+
+
   function showCoords(evt)
 {
     var mp=evt.mapPoint;
@@ -270,11 +287,21 @@
         }
       });
       }
+  function zoomToExtent(){
+  	 map.centerAndZoom(new esri.geometry.Point({
+                "x": 97.39,
+                "y": 39.91,
+                "spatialReference": {
+                    "wkid": 4326
+                }
+            }), 4);
+  }
   </script>
 
 <body>
   <div id="map">
   <div id="Coords"></div>
+  <div id="HomeButton"  onclick="zoomToExtent()" ></div>
   </div>
 </body>
 
